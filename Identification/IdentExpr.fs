@@ -1,5 +1,14 @@
 namespace Identification
 
+type Ellipse = {
+  RadiusX : float
+  RadiusY : float
+}
+
+type Circle =
+  private |
+  Circle of Ellipse
+
 type IdentVar =
 | IdentVar of name : string
 

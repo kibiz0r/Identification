@@ -6,6 +6,8 @@
 
 open Fake
 open System
+open Fake.Testing.Expecto
+
 
 // --------------------------------------------------------------------------------------
 // Build variables
@@ -69,18 +71,37 @@ Target "Build" (fun _ ->
 
 Target "Rebuild" DoNothing
 
+let runTests () =
+    !! "Identification.Tests/bin/Debug/**/*.exe"
+    |> Expecto id
+
+Target "Test" (fun _ ->
+    runTests ()
+)
+Target "Watch" (fun _ ->
+    use watcher = !! "Identification.Tests/bin/Debug/**/*.exe" |> WatchChanges (fun changes -> 
+        tracefn "%A" changes
+        runTests()
+    )
+
+    System.Console.ReadLine() |> ignore //Needed to keep FAKE from exiting
+
+    watcher.Dispose() // Use to stop the watch from elsewhere, ie another task.
+)
+
 // --------------------------------------------------------------------------------------
 // Build order
 // --------------------------------------------------------------------------------------
 
-"Clean" ==> "Rebuild"
+"Clean" ?=> "Build"
+"Restore" ?=> "Build"
 
 "InstallDotNetCLI"
     ==> "Restore"
     ==> "Rebuild"
-
-"Clean" ?=> "Build"
-"Restore" ?=> "Build"
+"Clean" ==> "Rebuild"
 "Build" ==> "Rebuild"
+
+"Build" ==> "Test"
 
 RunTargetOrDefault "Build"

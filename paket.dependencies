@@ -1,6 +1,7 @@
 source https://www.nuget.org/api/v2
 
-framework: >= net461
+framework: netstandard2.0, netcoreapp2.0
+
 nuget Expecto
 nuget FsUnit
 nuget FAKE
